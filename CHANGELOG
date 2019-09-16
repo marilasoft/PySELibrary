@@ -1,0 +1,19 @@
+= 0.0.1-r0.1 (20190914)
+* Inicia session. (Portal de Usuario)
+* Obtiene la información de la cuenta. (Portal de Usuario)
+* Recarga la cuenta. (Portal de Usuario)
+* Obtiene el histórico de conexiones por meses. (Portal de Usuario)
+* Obtiene el histórico de recargas por mese. (Portal de Usuario)
+* Cierra session. (Portal de Usuario)
+
+= 0.0.1-r0.2 (20190915)
+* Obtiene el histórico de transferencias por meses. (Portal de Usuario)
+* Cambios menores en el código.
+
+= 0.0.1-r0.3 (20190916)
+* Transfiere saldo a otra cuenta nauta. (Portal de Usuario)
+* Inicia session. (Portal Cautivo)
+* Actualiza el tiempo disponible. (Portal Cautivo)
+* Cierra session. (Portal Cautivo)
+* Obtiene informacion de usuario. (Portal Cautivo)
+* Obtiene terminos de uso. (Portal Cautivo)
