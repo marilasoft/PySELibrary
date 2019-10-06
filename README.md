@@ -8,7 +8,7 @@ y el [Portal Cautivo](https://secure.etecsa.net:8443/) de nauta; así como el
 [Portal Mi Cubacel](https://mi.cubacel.net), ahorrándoles tiempo, esfuerzos, neuronas y código a los desarrolladores.
  
 PySELibrary pretende ser no solo multiplataforma, sino también multilenguaje, échale un vistazo a
-[SELibrary](https://gitlab.home.asr/marilasoft/SELibrary/); la misma librería escrita en Java.
+[SELibrary](https://github.com/marilasoft/selibrary/); la misma librería escrita en Java.
 Esta, la versión en Python usa la librería [BeautifulSoup4](http://www.crummy.com/software/BeautifulSoup/bs4/) para el
 procesamiento de páginas web (`los portales de ETECSA`), mientras que la versión en Java usa
 [Jsoup](https://jsoup.org/).
