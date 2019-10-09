@@ -8,12 +8,12 @@ y el [Portal Cautivo](https://secure.etecsa.net:8443/) de nauta; así como el
 [Portal Mi Cubacel](https://mi.cubacel.net), ahorrándoles tiempo, esfuerzos, neuronas y código a los desarrolladores.
  
 PySELibrary pretende ser no solo multiplataforma, sino también multilenguaje, échale un vistazo a
-[SELibrary](https://github.com/marilasoft/selibrary/); la misma librería escrita en Java.
+[selibrary](https://github.com/marilasoft/selibrary/); la misma librería escrita en Java.
 Esta, la versión en Python usa la librería [BeautifulSoup4](http://www.crummy.com/software/BeautifulSoup/bs4/) para el
 procesamiento de páginas web (`los portales de ETECSA`), mientras que la versión en Java usa
 [Jsoup](https://jsoup.org/).
 
-Por el momento PySELibrary a logrado implementar 8 funciones que representan el 100% de
+Por el momento PySELibrary a logrado implementar 10 funciones que representan el 100% de
 las operaciones que permite realizar el [Portal de Usuario](https://www.portal.nauta.cu/) nauta en las cuentas no
 asociadas a Nauta Hogar, estas son:
 * Iniciar session.
@@ -23,6 +23,8 @@ asociadas a Nauta Hogar, estas son:
 * Obtener el histórico de conexiones por meses.
 * Obtener el histórico de recargas por meses.
 * Obtener el histórico de transferencias por meses.
+* Cambiar contraseña de la cuenta logeada.
+* Cambiar contraseña de la cuenta de correo asociada.
 * Cerrar session.
 
 Aún falta por implementar:
@@ -35,6 +37,17 @@ Mientras que la clase CaptivePortal, la encargada de interactuar con el
 * Cerrar session.
 * Obtener informacion del usuario.
 * Acceder a los terminos de uso.
+
+La clase MCPortal es la encargada de interactuar con el [Portal Mi Cubacel](https://mi.cubacel.net),
+y hasta el momento solo es capaz de logearse y obtener alguna informacion del usuario.
+* Inicia session.
+* Recupera la informacion siguiente:
+    * Numero de telefono.
+    * Saldo.
+    * Fecha de expiracion del saldo.
+    * Fecha en la que se utilizo el servicio 'Adelanta Saldo' (si aun debe el saldo adelantado).
+    * Saldo por pagar (si aun debe el saldo adelantado).
+    * Numeros asociados al servicio 'Plan Amigo' (de existir estos).
 
 ## Ejemplos:
 
@@ -90,6 +103,27 @@ print(captive_portal.update_available_time(cookies))
 
 # cerrando session
 captive_portal.logout(cookies)
+
+```
+
+### Iniciando session con MCPortal
+
+```python
+from PySELibrary import MCPortal
+
+mc_portal = MCPortal()
+# Inicia session con un numero (de 8 digitos; sin el codigo del pais)
+# y una contraseña
+mc_portal.login("55555555", "password")
+# Imprime la informacion de la cuenta
+print(mc_portal.credit)
+print(mc_portal.phone_number)
+print(mc_portal.expire)
+print(mc_portal.date)
+print(mc_portal.payable_balance)
+print(mc_portal.phone_number_one)
+print(mc_portal.phone_number_two)
+print(mc_portal.phone_number_tree)
 
 ```
 
