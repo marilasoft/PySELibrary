@@ -36,7 +36,9 @@ url_list = {"base": "https://www.portal.nauta.cu/",
             "captive_portal_online_do": "https://secure.etecsa.net:8443/web/online.do?"
                                         "CSRFHW=f28fea085dfdf24fbbd2f2b7c12581e9&",
             "captive_protal_get_time": "https://secure.etecsa.net:8443/EtecsaQueryServlet",
-            "captive_portal_base_url": "https://secure.etecsa.net:8443"}
+            "captive_portal_base_url": "https://secure.etecsa.net:8443",
+            "mcportal_url_base": "https://mi.cubacel.net",
+            "mcportal_url_login_post": "https://mi.cubacel.net:8443/login/Login"}
 
 headers = {"user-agent": "%s/%s" % (APP_NAME, VERSION)}
 
@@ -554,3 +556,118 @@ class CaptivePortal(object):
                 self.terms_of_use.append(term.text)
         except AttributeError:
             pass
+
+
+class MCPortal(object):
+
+    def __init__(self):
+        self.cookies = None
+        self.page = None
+        self.url_CMPortal = {}
+        self.headers = {"user-agent": "Mozilla/5.0"}
+
+    def login(self, phone_number, password):
+        connection = connect(url_list["mcportal_url_base"], headers=self.headers, verify=False)
+        self.page = BeautifulSoup(connection.text, "html.parser")
+        url_spanish = ""
+        # url_english = ""
+        urls = self.page.find_all("a", {"class", "link_msdp langChange"})
+        for url in urls:
+            if url.attrs["id"] == "spanishLanguage":
+                url_spanish = url.attrs["href"]
+            # elif url.attrs["id"] == "englishLanguage":
+            #     url_english = url.attrs["href"]
+        self.cookies = connection.cookies
+        connection = connect(url_list["mcportal_url_base"] + url_spanish, cookies=self.cookies, headers=self.headers,
+                             verify=False)
+        self.cookies = connection.cookies
+        data = {"language": "es_ES", "username": phone_number, "password": password, "uword": "step"}
+        connection = connect(url_list["mcportal_url_login_post"], data=data, cookies=self.cookies, headers=self.headers,
+                             verify=False, method="POST")
+        self.page = BeautifulSoup(connection.text, "html.parser")
+        urls = self.page.find_all("a", {"class", "link_msdp langChange"})
+        for url in urls:
+            if url.attrs["id"] == "spanishLanguage":
+                url_spanish = url.attrs["href"]
+            # elif url.attrs["id"] == "englishLanguage":
+            #     url_english = url.attrs["href"]
+        self.cookies = connection.cookies
+        connection = connect(url_list["mcportal_url_base"] + url_spanish, cookies=self.cookies, headers=self.headers,
+                             verify=False)
+        self.page = BeautifulSoup(connection.text, "html.parser")
+        divs = self.page.find_all("div", {"class": "collapse navbar-collapse navbar-main-collapse"})
+        lis = divs[0].find_all("li")
+        for li in lis:
+            if li.text == " Ofertas ":
+                self.url_CMPortal["offers"] = url_list["mcportal_url_base"] + li.find_all("a")[0].attrs["href"]
+            elif li.text == " Productos ":
+                self.url_CMPortal["products"] = url_list["mcportal_url_base"] + li.find_all("a")[0].attrs["href"]
+            elif li.text == " Mi Cuenta ":
+                self.url_CMPortal["myAccount"] = url_list["mcportal_url_base"] + li.find_all("a")[0].attrs["href"]
+            elif li.text == " Soporte ":
+                self.url_CMPortal["support"] = url_list["mcportal_url_base"] + li.find_all("a")[0].attrs["href"]
+        self.load_my_account()
+
+    def load_my_account(self):
+        self.page = BeautifulSoup(connect(self.url_CMPortal["myAccount"], cookies=self.cookies, headers=self.headers,
+                                          verify=False).text,
+                                  "html.parser")
+
+    @property
+    def credit(self):
+        divs_col = self.page.find_all("div", {"class": "col2"})
+        for div in divs_col:
+            if div.text.startswith(" Saldo: "):
+                return div.find_all("span", {"class", "cvalue"})[0].text
+
+    @property
+    def phone_number(self):
+        divs_col = self.page.find_all("div", {"class": "col1"})
+        for div in divs_col:
+            if div.text.startswith(" Número de Teléfono: "):
+                return div.find_all("span", {"class", "cvalue"})[0].text
+
+    @property
+    def expire(self):
+        divs_col = self.page.find_all("div", {"class": "col2"})
+        for div in divs_col:
+            if div.text.startswith("Expira: "):
+                return div.find_all("span", {"class", "cvalue"})[0].text
+
+    @property
+    def date(self):
+        divs_col = self.page.find_all("div", {"class": "col1a"})
+        for div in divs_col:
+            if div.text.startswith("Fecha del Adelanto: "):
+                return div.find_all("span", {"class", "cvalue"})[0].text
+
+    @property
+    def payable_balance(self):
+        divs_col = self.page.find_all("div", {"class": "col2a"})
+        for div in divs_col:
+            if div.text.startswith(" Saldo pendiente por pagar: "):
+                return div.find_all("span", {"class", "cvalue"})[0].text
+
+    @property
+    def phone_number_one(self):
+        form_ph1 = self.page.find_all("form", {"id": "phForm1"})
+        if len(form_ph1) == 1:
+            for input_ in form_ph1[0].find_all("input", {"type": "hidden"}):
+                if input_.attrs["id"] == "cancelFlag":
+                    return input_.attrs["value"]
+
+    @property
+    def phone_number_two(self):
+        form_ph1 = self.page.find_all("form", {"id": "phForm2"})
+        if len(form_ph1) == 1:
+            for input_ in form_ph1[0].find_all("input", {"type": "hidden"}):
+                if input_.attrs["id"] == "cancelFlag":
+                    return input_.attrs["value"]
+
+    @property
+    def phone_number_tree(self):
+        form_ph1 = self.page.find_all("form", {"id": "phForm3"})
+        if len(form_ph1) == 1:
+            for input_ in form_ph1[0].find_all("input", {"type": "hidden"}):
+                if input_.attrs["id"] == "cancelFlag":
+                    return input_.attrs["value"]
