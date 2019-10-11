@@ -1,3 +1,5 @@
+from PySELibrary.core.templates import Product
+
 APP_NAME = "PySELibrary"
 VERSION = "0.0.1-r0.3"
 DESCRIPTION = "Interactua con los servicios web de ETECSA."
@@ -53,6 +55,7 @@ from .core import LoginException
 from .core import Recharge
 from .core import RechargeException
 from .core import Transfer
+from .core import Product
 from .net import connect
 from .net import get_captcha
 from .net import get_cookies
@@ -563,6 +566,7 @@ class MCPortal(object):
     def __init__(self):
         self.cookies = None
         self.page = None
+        self.status = {"status": "", "msg": ""}
         self.url_CMPortal = {}
         self.headers = {"user-agent": "Mozilla/5.0"}
 
@@ -612,6 +616,36 @@ class MCPortal(object):
         self.page = BeautifulSoup(connect(self.url_CMPortal["myAccount"], cookies=self.cookies, headers=self.headers,
                                           verify=False).text,
                                   "html.parser")
+
+    def load_products(self, cookies):
+        self.page = BeautifulSoup(connect(self.url_CMPortal["products"], cookies=cookies, headers=self.headers,
+                                          verify=False).text,
+                                  "html.parser")
+
+    def buy(self, url_action, cookies):
+        self.page = BeautifulSoup(connect(url_list["mcportal_url_base"] + url_action, cookies=cookies, verify=False,
+                                          headers=self.headers).text,
+                                  "html.parser")
+        url_buy = self.page \
+            .find_all("a", {"class": "offerPresentationProductBuyLink_msdp button_style link_button"})[0] \
+            .attrs["href"]
+        self.page = BeautifulSoup(connect(url_list["mcportal_url_base"] + url_buy, cookies=cookies, verify=False,
+                                          headers=self.headers).text,
+                                  "html.parser")
+        msg = self.page.find_all("div", {"class": "products_purchase_details_block"})[0].find_all("p")[-1].text
+        if msg.startswith("Ha ocurrido un error."):
+            self.status["status"] = "error"
+            self.status["msg"] = msg
+        else:
+            self.status["status"] = "success"
+            self.status["msg"] = "Su solicitud esta siendo procesada."
+
+    def get_products(self, cookies):
+        products = []
+        self.load_products(cookies)
+        for product in self.page.find_all("div", {"class": "product_inner_block"}):
+            products.append(Product(product))
+        return products
 
     @property
     def credit(self):
