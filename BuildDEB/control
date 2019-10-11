@@ -1,10 +1,10 @@
 Package: PySELibrary
-Version: 0.0.1-r0.3
+Version: 0.0.1-r0.4
 Architecture: all
-Maintainer: MarilaSoft Team <marilasoft@gmail.com>
+Maintainer: MarilaSoft<marilasoft@gmail.com>
 Installed-Size: 52429
 Section: ETECSA Nauta tools
 Priority: optional
 Depends: python3 (>=3.6)
-Homepage: https://gitlab.home.asr/lesclazsoft/PySELibrary
+Homepage: https://github.com/marilasoft/PySELibrary
 Description: PySELibrary fue creada para la Comunidad Android de Cuba, para facilitar el desarrollo de aplicaciones en Python que interactúen con el Portal de Usuario y el Portal Cautivo de nauta; así como el Portal Mi Cubacel, ahorrándoles tiempo, esfuerzos, neuronas y código a los desarrolladores.
