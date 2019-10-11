@@ -116,6 +116,7 @@ from PySELibrary import MCPortal
 
 if __name__ == '__main__':
     mc_portal = MCPortal()
+    # Iniciando session y mostrando informacion de cuenta por pantalla
     mc_portal.login("55555555", "password")
     print(mc_portal.credit)
     print(mc_portal.phone_number)
@@ -125,6 +126,9 @@ if __name__ == '__main__':
     print(mc_portal.phone_number_one)
     print(mc_portal.phone_number_two)
     print(mc_portal.phone_number_tree)
+    # Saber si la tarifa por consumo esta activa (True o False)
+    active_bonus_services = mc_portal.active_bonus_services
+    # recuperando productos e intentando comprar el primero de la lista
     products = mc_portal.get_products(mc_portal.cookies)
     product = products[0]
     print(product.title)
@@ -134,6 +138,9 @@ if __name__ == '__main__':
     print(product.actions["buy"])
     mc_portal.buy(product.actions['buy'], mc_portal.cookies)
     print(mc_portal.status["status"].upper() + ": " + mc_portal.status["msg"])
+    # Cambiando el estado de la tarifa por consumo
+    mc_portal.change_bonus_services(active_bonus_services, mc_portal.url_CMPortal["changeBonusServices"],
+                                    mc_portal.cookies)
 
 ```
 
