@@ -40,14 +40,16 @@ Mientras que la clase CaptivePortal, la encargada de interactuar con el
 
 La clase MCPortal es la encargada de interactuar con el [Portal Mi Cubacel](https://mi.cubacel.net),
 y hasta el momento solo es capaz de logearse y obtener alguna informacion del usuario.
+Acciones que realiza:
 * Inicia session.
 * Recupera la informacion siguiente:
     * Numero de telefono.
     * Saldo.
     * Fecha de expiracion del saldo.
-    * Fecha en la que se utilizo el servicio 'Adelanta Saldo' (si aun debe el saldo adelantado).
+    * Fecha en la que se utilizo el servicio `Adelanta Saldo` (si aun debe el saldo adelantado).
     * Saldo por pagar (si aun debe el saldo adelantado).
     * Numeros asociados al servicio 'Plan Amigo' (de existir estos).
+* Recupera y compra productos (`paquetes`) (`la compra de paquetes no ha sido probada aun.`)
 
 ## Ejemplos:
 
@@ -87,22 +89,23 @@ print(user_portal.mail_account)
 ```python
 from PySELibrary import CaptivePortal
 
-captive_portal = CaptivePortal()
-
-# Cargamos la informacion necesaria para iniciar session
-captive_portal.pre_login()
-cookies = captive_portal.cookies
-
-# Iniciamos session con la informacion que se nos pide
-captive_portal.login(input("Usuario: "),
-                input("Contrasena: "),
-                cookies)
-
-# Mostramos por pantalla el tiempo disponible
-print(captive_portal.update_available_time(cookies))
-
-# cerrando session
-captive_portal.logout(cookies)
+if __name__ == '__main__':
+    captive_portal = CaptivePortal()
+    
+    # Cargamos la informacion necesaria para iniciar session
+    captive_portal.pre_login()
+    cookies = captive_portal.cookies
+    
+    # Iniciamos session con la informacion que se nos pide
+    captive_portal.login(input("Usuario: "),
+                    input("Contrasena: "),
+                    cookies)
+    
+    # Mostramos por pantalla el tiempo disponible
+    print(captive_portal.update_available_time(cookies))
+    
+    # cerrando session
+    captive_portal.logout(cookies)
 
 ```
 
@@ -111,19 +114,26 @@ captive_portal.logout(cookies)
 ```python
 from PySELibrary import MCPortal
 
-mc_portal = MCPortal()
-# Inicia session con un numero (de 8 digitos; sin el codigo del pais)
-# y una contraseña
-mc_portal.login("55555555", "password")
-# Imprime la informacion de la cuenta
-print(mc_portal.credit)
-print(mc_portal.phone_number)
-print(mc_portal.expire)
-print(mc_portal.date)
-print(mc_portal.payable_balance)
-print(mc_portal.phone_number_one)
-print(mc_portal.phone_number_two)
-print(mc_portal.phone_number_tree)
+if __name__ == '__main__':
+    mc_portal = MCPortal()
+    mc_portal.login("55555555", "password")
+    print(mc_portal.credit)
+    print(mc_portal.phone_number)
+    print(mc_portal.expire)
+    print(mc_portal.date)
+    print(mc_portal.payable_balance)
+    print(mc_portal.phone_number_one)
+    print(mc_portal.phone_number_two)
+    print(mc_portal.phone_number_tree)
+    products = mc_portal.get_products(mc_portal.cookies)
+    product = products[0]
+    print(product.title)
+    print(product.description)
+    print(product.price)
+    print(product.actions["mostInfo"])
+    print(product.actions["buy"])
+    mc_portal.buy(product.actions['buy'], mc_portal.cookies)
+    print(mc_portal.status["status"].upper() + ": " + mc_portal.status["msg"])
 
 ```
 
