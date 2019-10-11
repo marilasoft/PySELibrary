@@ -1,3 +1,5 @@
+import re
+
 from PySELibrary.core.templates import Product
 
 APP_NAME = "PySELibrary"
@@ -611,6 +613,8 @@ class MCPortal(object):
             elif li.text == " Soporte ":
                 self.url_CMPortal["support"] = url_list["mcportal_url_base"] + li.find_all("a")[0].attrs["href"]
         self.load_my_account()
+        self.url_CMPortal["changeBonusServices"] = url_list["mcportal_url_base"] + self.page \
+            .find_all("form", {"id": "toogle-internet"})[0].attrs["action"]
 
     def load_my_account(self):
         self.page = BeautifulSoup(connect(self.url_CMPortal["myAccount"], cookies=self.cookies, headers=self.headers,
@@ -621,6 +625,16 @@ class MCPortal(object):
         self.page = BeautifulSoup(connect(self.url_CMPortal["products"], cookies=cookies, headers=self.headers,
                                           verify=False).text,
                                   "html.parser")
+
+    def change_bonus_services(self, active_bonus_services, url_action, cookies):
+        data = {}
+        if active_bonus_services:
+            data["onoffswitchctm"] = "off"
+        else:
+            data["onoffswitch"] = "on"
+            data["onoffswitchctm"] = "on"
+        connect(url_action, data, cookies=cookies, verify=False, headers=self.headers,
+                method="POST")
 
     def buy(self, url_action, cookies):
         self.page = BeautifulSoup(connect(url_list["mcportal_url_base"] + url_action, cookies=cookies, verify=False,
@@ -705,3 +719,12 @@ class MCPortal(object):
             for input_ in form_ph1[0].find_all("input", {"type": "hidden"}):
                 if input_.attrs["id"] == "cancelFlag":
                     return input_.attrs["value"]
+
+    @property
+    def active_bonus_services(self):
+        script = self.page.find_all("script")[-1].text
+        onoff_re = "prop='(.*?)';"
+        if re.findall(onoff_re, script)[-1] == "false":
+            return False
+        else:
+            return True
