@@ -75,3 +75,34 @@ class Transfer(object):
 
         return datetime(int(year), int(month), int(day),
                         int(hours), int(minutes), int(seconds))
+
+
+class Product(object):
+
+    def __init__(self, product):
+        self.product = product
+
+    @property
+    def title(self):
+        return self.product.find_all("h4")[0].text
+
+    @property
+    def description(self):
+        return self.product.find_all("div", {"class": "offerPresentationProductDescription_msdp product_desc"})[0] \
+            .find_all("span")[0].text
+
+    @property
+    def price(self):
+        return self.product.find_all("div", {"class": "offerPresentationProductDescription_msdp product_desc"})[0] \
+                   .find_all("span", {"class": "bold"})[0].text + " CUC"
+
+    @property
+    def actions(self):
+        actions = {}
+        actions_ = self.product.find_all("div", {"class": "offerPresentationProductBuyAction_msdp ptype"})[0]
+        actions["mostInfo"] = actions_.find_all("a", {"class": "offerPresentationProductBuyLink_msdp"})[0] \
+            .attrs["href"]
+        actions["buy"] = actions_ \
+            .find_all("a", {"class": "offerPresentationProductBuyLink_msdp button_style link_button"})[0] \
+            .attrs["href"]
+        return actions
